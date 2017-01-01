@@ -1,0 +1,41 @@
+本程序由五个主要部分构成：
+1.ASCII码权重统计
+    权重统计函数：
+        void weight(int *w,char *name)
+    主要功能及实现原理：
+通过逐个字节读入目标文件中的ASCII码统计文件中各ASCII码的频数。计算出相对权重并用一维数组w记录。w的长度为ASCII码的数量加一。加的一个为压缩文件结尾标识符，其权重值记为1.
+为了防止目标文件太大导致权重值过大，设定i记录权重值的和，当i的值到一定大小按比例减少w的值，代码如下：
+    if(i>=100000000)
+			for(j=0,i=1;j<MAX-1;++j){w[j]=(w[j]+1)/2;i=i+w[j];}
+2.Huffman树构造
+定义节点结构：
+typedef struct
+{
+	unsigned int weight;
+	unsigned int parent,lchild,rchild;
+}HTnode,*Huffmantree;
+huffman树构造函数：
+    Huffmantree Huffmantreeing(Huffmantree HT,int *w)
+辅助函数：
+    void select(Huffmantree HT,int n,int *s1,int *s2)
+    主要功能及实现原理：
+利用权重数组的信息生成Huffman树并返回。
+通过select函数选择两个权重最小的树作为左右子树生成新树，循环，直到所有节点都在一颗树上。
+3.获取huffman编码
+Huffman码函数：
+    Huffmancode Huffmancoding(Huffmantree HT)
+主要功能及实现原理：
+通过由叶子节点到根节点的方式逆序遍历Huffman树，得到各ASCII码和结尾标识符对应的Huffman码并以字符串的形式返回。
+
+4.压缩模块
+压缩函数：
+void infotohuff(Huffmancode HC,char *name_in,char*name_bin,int &in,int &out)
+主要功能及实现原理：
+首先，按字节逐个提取目标文件中的ASCII码。然后，将对应的Huffman码按读入ASCII码的顺序排列，每8个二进制长度huffman码构成一个字节，并将这个字节写入压缩文件。结尾添加结尾标识符的Huffman码作为压缩文件结束的标志。若最后一部分构不成8位二进制数则通过补零使之构成8位二进制数便于合成一个字节。
+此函数通过边读目标文件边写压缩文件的流处理方式完成压缩，节省了内存。
+5.解压模块
+解压函数：
+    void hufftoinfo(Huffmantree HT,char*name_bin,char *name_out)
+主要功能及实现原理：
+首先，按字节逐个提取目标文件中的数据。然后，将提取出的数据转化成二进制码并按顺序排列。最后，从根节点开始按二进制码遍历到叶子节点，得到对应ASCII码并写入还原文件，直到读到压缩文件中的结尾标志。
+与压缩函数相似，此函数通过边读压缩文件边写还原文件的流处理方式完成解压，节省了内存。
