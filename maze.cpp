@@ -65,7 +65,7 @@ void drawCol(COORD a, COORD b, char ch)
 	}
 }
 
-int control()//¿ØÖÆº¯Êý£¬·µ»ØÉÏÏÂ×óÓÒ¡¢ESC
+int control()//¿ØÖÆº¯Êý£¬·µ»ØÉÏÏÂ×óÓÒ¡¢»Ø³µ¡¢ESC
 {
 		int ch;
 		if( (ch=getch())==0x1B ) return 5;/* Press ESC to quit... */
@@ -114,19 +114,43 @@ void drawmenu()//²Ëµ¥±ß¿ò
 	SetPos(24, 21);printf("ÖÆ×÷:    ±ß×ÓÌÎ    bztup@qq.com");
 }
 
-void drawPlaying()//ÓÎÏ·½çÃæ
-{}
-
-void readM(char*fname,int** M)//ÌáÈ¡ÃÔ¹¬¾ØÕó
+char** readindex()//ÌáÈ¡Ä¿Â¼ÎÄ¼þÐÅÏ¢
 {
-	//´ò¿ªÎÄ¼þr
-	//
+	FILE*f;
+	char **index,*fname;
+	if((f=fopen("index.txt", "r"))==NULL)//´ò¿ªÎÄ¼þr
+		{printf("cannot open file\n");return 0;}
+	//ÌáÈ¡Ä¿Â¼
+	fclose(f);//close
+	return index;
+}
+
+void writeindex(char*fname)//½«Ä¿Â¼ÎÄ¼þÐÅÏ¢Ð´ÈëÎÄ¼þ
+{
+	FILE*f;
+	if((f=fopen(fname, "w+"))==NULL)//´ò¿ªÎÄ¼þw
+		{printf("cannot open file\n");return;}
+	//Ð´ÈëÄ¿Â¼ÎÄ¼þÐÅÏ¢
+	fclose(f);//close
+}
+
+int** readM(char*fname)//ÌáÈ¡ÃÔ¹¬¾ØÕó
+{
+	FILE*f;int** M;
+	if((f=fopen(fname, "r"))==NULL)//´ò¿ªÎÄ¼þr
+		{printf("cannot open file\n");return 0;}
+	//ÌáÈ¡ÃÔ¹¬¾ØÕó
+	fclose(f);//close
+	return M;
 }
 
 void writeM(char*fname,int** M)//½«ÃÔ¹¬¾ØÕóÐ´ÈëÎÄ¼þ
 {
-	//´ò¿ªÎÄ¼þw
-	//
+	FILE*f;
+	if((f=fopen(fname, "w"))==NULL)//´ò¿ªÎÄ¼þw
+		{printf("cannot open file\n");return;}
+	//Ð´ÈëÃÔ¹¬¾ØÕó
+	fclose(f);//close
 }
 
 void drawselect()//Ñ¡Ôñ½çÃæ
@@ -136,7 +160,10 @@ int** selectmaze()//´ÓÒÑÓÐÑ¡ÔñÃÔ¹¬²¢´«»ØÃÔ¹¬Êý×é
 {
 	drawmenu();
 	int** M;
-	//readM();
+	char fname[20],**index;
+	index=readindex();
+	//scanf("%s",&fname);
+	M=readM(fname);
 	//printfÑ¡Ôñ½çÃæ
 	//Ä¬ÈÏÃÔ¹¬¡¢ÃÔ¹¬´æµµ
 	//reprint Ñ¡Ôñ>> ÃÔ¹¬Ô¤ÀÀdrawmaze(int** M,int x,int y)
@@ -145,9 +172,10 @@ int** selectmaze()//´ÓÒÑÓÐÑ¡ÔñÃÔ¹¬²¢´«»ØÃÔ¹¬Êý×é
 	return 0;
 }
 
-void drawset()//ÐÂ½¨½çÃæ
+int drawset()//Éè¶¨½çÃæ
 {
 	//Éè¶¨½çÃæ(·½Ïò¼üÑ¡Ôñ>>¿Õ¸ñ±äµØÐÎ¡¢×óÊý×ÖÐÐÑ¡Ïî(É¾³ý/ÐÂ½¨ÐÐ)¡¢ÉÏÊý×ÖÁÐÑ¡Ïî(É¾³ý/ÐÂ½¨ÁÐ)>>±ê¼ÇÆðµãA¡¢±ê¼ÇÖÕµãB»Ø³µÈ·ÈÏ)
+	return 0;
 }
 
 int setmaze(int k)//Éè¶¨¡¢ÐÞ¸ÄÃÔ¹¬
@@ -165,6 +193,9 @@ int setmaze(int k)//Éè¶¨¡¢ÐÞ¸ÄÃÔ¹¬
 	return 0;
 }
 
+void drawPlaying()//ÓÎÏ·½çÃæ
+{}
+
 int game()
 {
 	char a;
@@ -172,13 +203,16 @@ int game()
 	int** M;
 	//Ñ¡ÔñµØÍ¼
 	//Ñ¡ÔñÄ£Ê½£¨×ÔÓÉ¡¢¼ÆÊ±£©
+	//drawPlaying()//ÓÎÏ·½çÃæ
 	drawmaze(M,x,y);//»æÖÆµØÍ¼¡¢»æÖÆÀÏÊó
 	//control();
 	return 0;
 }
 
-int load()//È«²¿Â·¾¶¡¢×îÓÅÂ·¾¶£¨¹ã¶ÈÓÅÏÈ±éÀú£©
-{return 0;}
+int** load()//È«²¿Â·¾¶¡¢×îÓÅÂ·¾¶£¨¹ã¶ÈÓÅÏÈ±éÀú£©,·µ»Ø×îÓÅÂ·¾¶
+{
+	return 0;
+}
 
 int mainmenu()
 {
