@@ -4,6 +4,16 @@
 #include<string.h>
 #define  Array_Len(array)   (sizeof(array) / sizeof(array[0]))
 
+/*=============== all the structures ===============*/
+
+typedef struct Frame
+{
+	COORD position[2];
+	int flag;
+}Frame;
+
+/*=============== all the functions ===============*/
+
 //ÉèÖÃ¹â±êÎ»ÖÃ
 void SetPos(COORD a)// set cursor 
 {
@@ -63,6 +73,29 @@ void drawCol(COORD a, COORD b, char ch)
 		printf("error code 02£ºÎÞ·¨Ìî³äÁÐ£¬ÒòÎªÁ½¸ö×ø±êµÄºá×ø±ê(y)²»ÏàµÈ");
 		system("pause");
 	}
+}
+
+//×óÉÏ½Ç×ø±ê¡¢ÓÒÏÂ½Ç×ø±ê¡¢ÓÃrowÌî³äÐÐ¡¢ÓÃcolÌî³äÁÐ
+void drawFrame(COORD a, COORD  b, char row, char col)
+{
+	drawRow(a.Y, a.X+1, b.X-1, row);
+	drawRow(b.Y, a.X+1, b.X-1, row);
+	drawCol(a.X, a.Y+1, b.Y-1, col);
+	drawCol(b.X, a.Y+1, b.Y-1, col);
+}
+
+void drawFrame(int x1, int y1, int x2, int y2, char row, char col)
+{
+	COORD a={x1, y1};
+	COORD b={x2, y2};
+	drawFrame(a, b, row, col);
+}
+
+void drawFrame(Frame frame, char row, char col)
+{
+	COORD a = frame.position[0];
+	COORD b = frame.position[1];
+	drawFrame(a, b, row, col);
 }
 
 int control()//¿ØÖÆº¯Êý£¬·µ»ØÉÏÏÂ×óÓÒ¡¢»Ø³µ¡¢ESC
@@ -154,7 +187,9 @@ void writeM(char*fname,int** M)//½«ÃÔ¹¬¾ØÕóÐ´ÈëÎÄ¼þ
 }
 
 void drawselect()//Ñ¡Ôñ½çÃæ
-{}
+{
+	drawmenu();
+}
 
 int** selectmaze()//´ÓÒÑÓÐÑ¡ÔñÃÔ¹¬²¢´«»ØÃÔ¹¬Êý×é
 {
@@ -194,7 +229,13 @@ int setmaze(int k)//Éè¶¨¡¢ÐÞ¸ÄÃÔ¹¬
 }
 
 void drawPlaying()//ÓÎÏ·½çÃæ
-{}
+{
+	drawFrame(0, 0, 48, 24, '=', '|');//	draw map frame;
+	drawFrame(49, 0, 79, 4, '-', '|');//		draw output frame
+	drawFrame(49, 4, 79, 9, '-', '|');//		draw score frame
+	drawFrame(49, 9, 79, 20, '-', '|');//	draw operate frame
+	drawFrame(49, 20, 79, 24, '-', '|');//	draw other message frame
+}
 
 int game()
 {
@@ -254,6 +295,7 @@ int mainmenu()
 	return 0;
 }
 
+/*================== the main function ==================*/
 
 void main()
 {
