@@ -2,6 +2,7 @@
 #include<conio.h>
 #include<windows.h>
 #include<string.h>
+#define  Array_Len(array)   (sizeof(array) / sizeof(array[0]))
 
 //ÉèÖÃ¹â±êÎ»ÖÃ
 void SetPos(COORD a)// set cursor 
@@ -88,6 +89,8 @@ int control()//¿ØÖÆº¯Êý£¬·µ»ØÉÏÏÂ×óÓÒ¡¢ESC
 void drawmaze(int** M,int x,int y)//»æÖÆÃÔ¹¬
 {
 	int m,n,i,j;
+	m=Array_Len(M);
+	n=Array_Len(M[0]);
 	for(i=0;i<m;i++)
 	{
 		SetPos(x,y+i);
