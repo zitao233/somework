@@ -688,7 +688,7 @@ Maze* set(Maze*M)//设定界面
 	drawFrame(49, 4, 79, 9, '-', '|');
 	drawFrame(49, 9, 79, 20, '-', '|');
 	drawFrame(49, 20, 79, 24, '-', '|');
-	SetPos(54, 12);printf("a加行b减行");
+	SetPos(54, 12);printf("a加行z减行");
 	SetPos(54, 14);printf("s加列x减列");
 	SetPos(54, 16);printf("d设起点c设终点");
 	SetPos(54, 18);printf("空格转化（墙/路）");
@@ -719,10 +719,13 @@ Maze* set(Maze*M)//设定界面
 			case 122://减行z
 				if(M->m>5)
 				{
-					if(i==M->m-2) --i;
+					if(i==M->m-2)	--i;
+					free(M->M[M->m-2]);
 					M->M[M->m-2]= M->M[M->m-1];
 					M->m =M->m-1;
-					free(M->M[M->m]);
+					//printf("test\n");//
+					//free(M->M[M->m]);
+					clearch(1, 1, 47, 23);
 					drawmaze(M,mx,my);
 				}
 				break;
@@ -748,6 +751,7 @@ Maze* set(Maze*M)//设定界面
 						M->M[mi]=(int*)realloc(M->M[mi],(M->n-1)*sizeof(int));
 					}			
 					M->n =M->n -1;
+					clearch(1, 1, 47, 23);
 					drawmaze(M,mx,my);
 				}
 				break;
