@@ -139,7 +139,38 @@ int control()//控制函数，返回上下左右、回车、ESC
 	return 0;
 }
 
-void drawmaze(Maze* M,int x,int y)//绘制迷宫
+void print(Maze* M,int i,int j)
+{
+	if(M->M[i][j]==1)printf("■");
+	else if(M->M[i][j]==0)printf("□");
+	else if(M->M[i][j]==2)printf("※");//终点
+	else if(M->M[i][j]==3)printf("●");
+	else if(M->M[i][j]==4)printf("◇");//选中标记（路）
+	else if(M->M[i][j]==5)printf("◆");//选中标记（墙）
+	else if(M->M[i][j]==6)printf("↑");
+	else if(M->M[i][j]==7)printf("↓");
+	else if(M->M[i][j]==8)printf("←");
+	else if(M->M[i][j]==9)printf("→");
+}
+
+void drawmaze(Maze* M)//绘制迷宫//定位
+{
+	int m,n,i,j;
+	m=M->m;
+	n=M->n;
+	printf("\n");
+	for(i=0;i<m;i++)
+	{
+		printf("\n");
+		for(j=0;j<n;j++)
+		{
+			print(M,i,j);
+		}
+	}
+	printf("\n");
+}
+
+void drawmaze(Maze* M,int x,int y)//绘制迷宫//定位
 {
 	int m,n,i,j;
 	m=M->m;
@@ -149,16 +180,7 @@ void drawmaze(Maze* M,int x,int y)//绘制迷宫
 		SetPos(x,y+i);
 		for(j=0;j<n;j++)
 		{
-			if(M->M[i][j]==1)printf("■");
-			else if(M->M[i][j]==0)printf("□");
-			else if(M->M[i][j]==2)printf("※");//终点
-			else if(M->M[i][j]==3)printf("●");
-			else if(M->M[i][j]==4)printf("◇");//选中标记（路）
-			else if(M->M[i][j]==5)printf("◆");//选中标记（墙）
-			else if(M->M[i][j]==6)printf("↑");
-			else if(M->M[i][j]==7)printf("↓");
-			else if(M->M[i][j]==8)printf("←");
-			else if(M->M[i][j]==9)printf("→");
+			print(M,i,j);
 		}
 	}
 }
@@ -578,6 +600,26 @@ int right2(Maze*A,Maze*B,int qi,int qj,int zi,int zj,int p,Load*L,position * P)/
 void load(Maze*M)//全部路径（深度优先遍历）、最优路径
 {
 	system("cls");
+	SetPos(0, 0);
+	int mi=0,mj=0,q=0,w=0;
+	int qi,qj,zi,zj;
+	for(mi=0;mi<M->m;++mi)
+	{
+		for(mj=0;mj<M->n;++mj)
+			if(M->M[mi][mj]==3) break;
+		if(M->M[mi][mj]==3) break;
+	}
+	if(mi<M->m) {q=1;qi=mi;qj=mj;}
+	else {printf("ERROR:  没有起点");}
+	for(mi=0;mi<M->m;++mi)
+	{
+		for(mj=0;mj<M->n;++mj)
+			if(M->M[mi][mj]==2) break;
+		if(M->M[mi][mj]==2) break;
+	}
+	if(mi<M->m) {w=1;zi=mi;zj=mj;}
+	else {printf("ERROR:  没有终点");}
+	//
 	Maze *B=(Maze *)malloc(LEN);
 	int i,j;
 	B->M =(int **)malloc(M->m*sizeof(int *));
@@ -587,31 +629,54 @@ void load(Maze*M)//全部路径（深度优先遍历）、最优路径
 		for(j=0;j<M->n ;++j)
 		{B->M[i][j]=0;}
 	B->m=M->m;B->n=M->n;
-	int qi=6,qj=6,zi=11,zj=11;
+	//int qi=6,qj=6,zi=11,zj=11;
 	Load*L=(Load *)malloc(LENL);L->n=0;
-	right2(M,B,qi,qj,zi,zj,0,L,NULL);
-	//
-	printf("全部路径：\n");
-	position *q;int *len=(int *)malloc(L->n*sizeof(int));
-	for(int k=0;k<L->n;++k)
+	if(right2(M,B,qi,qj,zi,zj,0,L,NULL))
 	{
-		len[k]=0;
-		printf("路径%d:",k+1);
+		//
+		Maze **C=(Maze **)malloc(L->n*LEN);
+		//
+		printf("全部路径：\n");
+		position *q;int *len=(int *)malloc(L->n*sizeof(int));
+		for(int k=0;k<L->n;++k)
+		{
+			//
+			C[k]=(Maze *)malloc(LEN);
+			int i,j;
+			C[k]->M =(int **)malloc(M->m*sizeof(int *));
+			for(i=0;i<M->m ;++i)
+				C[k]->M[i]=(int *)malloc(M->n*sizeof(int));
+			for(i=0;i<M->m ;++i)
+				for(j=0;j<M->n ;++j)
+				{C[k]->M[i][j]=M->M[i][j];}
+			C[k]->m=M->m;C[k]->n=M->n;
+			//
+			len[k]=0;
+			printf("\n路径%d:",k+1);
+			for(q=L->next[k] ;q->next!=NULL;q=q->next)
+			{
+				//
+				C[k]->M[q->i][q->j]=q->p+5; 
+				//
+				printf("<%d,%d>",q->i,q->j);
+				len[k]=len[k]+1;
+			}
+			printf("\n长度：%d\n",len[k]);
+			drawmaze(C[k]);
+		}
+		printf("\n最优路径：\n");
+		int l,n;
+		for(k=0,l=len[0],n=0;k<L->n;++k)
+		{
+			if(len[k]<l) {l=len[k];n=k;}
+		}
 		printf("<%d,%d>",qi,qj);
-		for(q=L->next[k] ;q->next!=NULL;q=q->next)
-		{printf("<%d,%d>",q->i,q->j);len[k]=len[k]+1;}
-		printf("\n长度：%d\n",len[k]);
+		for(q=L->next[n] ;q->next!=NULL;q=q->next)
+		{printf("<%d,%d>",q->i,q->j);}
+		printf("\n长度：%d\n",l);
+		drawmaze(C[n]);
 	}
-	printf("最优路径：\n");
-	int l,n;
-	for(k=0,l=len[0],n=0;k<L->n;++k)
-	{
-		if(len[k]<l) {l=len[k];n=k;}
-	}
-	printf("<%d,%d>",qi,qj);
-	for(q=L->next[n] ;q->next!=NULL;q=q->next)
-	{printf("<%d,%d>",q->i,q->j);}
-	printf("\n长度：%d\n",l);
+	else printf("没有路径\n");
 	system("pause");
 }
 
@@ -1134,9 +1199,9 @@ int mainmenu()
 				{	
 					SetPos(12, j);printf("　");j = 11;
 					SetPos(12, j);printf(">>");
-					SetPos(51, 13);printf("　　　　　　　　　　　　  ");
+					SetPos(51, 13);printf("　　　　　　　　　　　　      ");
 					SetPos(42, 11);printf("开始游戏：                ");
-					SetPos(46, 13);printf("选择地图并开始游戏。      ");
+					SetPos(46, 13);printf("选择地图并开始游戏。          ");
 				}
 				break;
 		case 2 :	
@@ -1144,9 +1209,9 @@ int mainmenu()
 				{	
 					SetPos(12, j);printf("　");	j = 13;
 					SetPos(12, j);printf(">>");
-					SetPos(51, 13);printf("　　　　　　　　　　　　　");
+					SetPos(51, 13);printf("　　　　　　　　　　　　　    ");
 					SetPos(42, 11);printf("设置地图：                ");
-					SetPos(46, 13);printf("建立新地图或更改地图存档。");
+					SetPos(46, 13);printf("修改/建立/删除地图、路径查找。");
 				}
 				break;
 		case 6 :if (j == 11)	return 1;else return 2;
@@ -1177,3 +1242,14 @@ void main()
 		printf("end_test\n");
 	}
 }
+/*
+int startMaze[9][9]={{1,1,1,1,1,1,1,1,1},
+					{1,0,0,0,0,0,1,1,1},
+					{1,0,1,1,1,0,0,0,1},
+					{1,0,1,0,1,1,0,1,1},
+					{1,0,1,0,-1,1,0,1,1},
+					{1,0,1,0,1,1,0,1,1},
+					{1,0,0,0,1,0,0,0,1},
+					{1,0,1,0,1,0,1,2,1},
+					{1,1,1,1,1,1,1,1,1}};
+*/
