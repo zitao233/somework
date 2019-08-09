@@ -1,12 +1,12 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
-#define MAX 257
+#define MAX 257 //2^8+1
 typedef struct
-{
-	unsigned int weight;
-	unsigned int parent,lchild,rchild;
-}HTnode,*Huffmantree;
+{//树节点 元素：权重 父节点 左子节点 右子节点
+	unsigned int weight;//权重 无符号整形
+	unsigned int parent,lchild,rchild;//父节点 左子节点 右子节点 无符号整形
+}HTnode,*Huffmantree;//声明指针*Huffmantree
 typedef char* *Huffmancode;
 
 void weight(int *w,char *name)
