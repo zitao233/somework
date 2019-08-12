@@ -19,15 +19,15 @@ void weight(int *w,char *name)
 	for(i=0;!feof(fp)&&fread(&q,1,1,fp);++i)//逐个读取
 	{
 		*(w+q)=*(w+q)+1;//计数
-		if(i>=100000000)
-			for(j=0,i=1;j<MAX-1;++j){w[j]=(w[j]+1)/2;i=i+w[j];}
+		if(i>=100000000)//权重总值过高，则折半
+			for(j=0,i=1;j<MAX-1;++j){w[j]=(w[j]+1)/2;i=i+w[j];}//+1保证原1还是1
 	}
 	fclose(fp);
 }//计算权重
 
 void select(Huffmantree HT,int n,int *s1,int *s2)
 {
-	int i,t=100000000;
+	int i,t=100000000;//t,临时变量，存当前最小权重
 	for(i=1;i<=n;i++)
 		if(HT[i].parent==0&&HT[i].weight<t)
 		{t=HT[i].weight;*s1=i;}
@@ -35,7 +35,7 @@ void select(Huffmantree HT,int n,int *s1,int *s2)
 	for(i=1;i<=n;i++)
 		if(HT[i].parent==0&&HT[i].weight<t&&i!=*s1)
 		{t=HT[i].weight;*s2=i;}
-}//选两个最小的
+}//选两个最小的无父节点子树
 
 Huffmantree Huffmantreeing(Huffmantree HT,int *w)
 {
