@@ -106,7 +106,7 @@ void infotohuff(Huffmancode HC,char *name_in,char*name_bin,int &in,int &out)
 	}
 	out=k;//压缩后字节数
 	fclose(fp);fclose(fh);
-}//压缩
+}//压缩、原文件到huffmancode
 
 void hufftoinfo(Huffmantree HT,char*name_bin,char *name_out)
 {
