@@ -7,18 +7,18 @@ typedef struct
 	unsigned int weight;//权重 无符号整形
 	unsigned int parent,lchild,rchild;//父节点 左子节点 右子节点 无符号整形
 }HTnode,*Huffmantree;//声明指针*Huffmantree
-typedef char* *Huffmancode;
+typedef char* *Huffmancode;//二级指针
 
 void weight(int *w,char *name)
 {
 	FILE *fp;
 	int i,j,q=0;
-	for(i=0;i<MAX-1;++i) w[i]=0;
-	if((fp=fopen(name, "rb"))==NULL)
+	for(i=0;i<MAX-1;++i) w[i]=0;//初始化
+	if((fp=fopen(name, "rb"))==NULL)//尝试打开文件
 		{printf("cannot open file\n");return;}
-	for(i=0;!feof(fp)&&fread(&q,1,1,fp);++i)
+	for(i=0;!feof(fp)&&fread(&q,1,1,fp);++i)//逐个读取
 	{
-		*(w+q)=*(w+q)+1;
+		*(w+q)=*(w+q)+1;//计数
 		if(i>=100000000)
 			for(j=0,i=1;j<MAX-1;++j){w[j]=(w[j]+1)/2;i=i+w[j];}
 	}
